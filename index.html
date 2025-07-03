@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate AI Prompt Builder Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'ai-purple': '#6366f1',
+                        'ai-blue': '#3b82f6',
+                        'ai-cyan': '#06b6d4',
+                        'dark-surface': '#1e293b',
+                        'dark-card': '#334155',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        .glass-effect {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .option-button.selected {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            box-shadow: 0 0 0 2px #60a5fa, 0 8px 25px rgba(59, 130, 246, 0.3);
+            transform: translateY(-1px);
+        }
+        .option-button.multi-selected {
+            background: linear-gradient(135deg, #6366f1, #4338ca);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+        }
+        .option-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        .option-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: rgba(148, 163, 184, 0.3);
+        }
+        .category-button.active {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        #options-panel, #generated-prompts-list {
+           scrollbar-width: thin;
+           scrollbar-color: #64748b #1e293b;
+        }
+        .framework-badge {
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .prompt-item {
+            background: rgba(51, 65, 85, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            transition: all 0.2s ease;
+        }
+        .prompt-item:hover {
+            background: rgba(51, 65, 85, 0.9);
+            border-color: rgba(148, 163, 184, 0.2);
+        }
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div class="grid grid-cols-12 gap-6 p-6 h-screen">
+        <!-- Sidebar -->
+        <div class="col-span-3 lg:col-span-2 glass-effect rounded-xl p-6 flex flex-col gap-3">
+             <div class="mb-6">
+                 <h2 class="text-xl font-bold text-white mb-2">AI PROMPT BUILDER</h2>
+                 <p class="text-sm text-slate-400">Professional frameworks & advanced prompting</p>
+             </div>
+             
+             <!-- Framework Categories -->
+             <button class="category-button text-left w-full px-4 py-3 rounded-lg font-semibold bg-ai-blue text-white active flex items-center gap-2" data-category="Frameworks">
+                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                     <path fill-rule="evenodd" d="M9.504 1.132a1 1 0 01.992 0l1.75 1a1 1 0 11-.992 1.736L10 3.152l-1.254.716a1 1 0 11-.992-1.736l1.75-1zM5.618 4.504a1 1 0 01-.372 1.364L5.016 6l.23.132a1 1 0 11-.992 1.736L3 7.723V8a1 1 0 01-2 0V6a.996.996 0 01.52-.878l1.734-.99a1 1 0 011.364.372zm8.764 0a1 1 0 011.364-.372l1.734.99A.996.996 0 0118 6v2a1 1 0 11-2 0v-.277l-1.254.145a1 1 0 11-.992-1.736L14.984 6l-.23-.132a1 1 0 01-.372-1.364zm-7 4a1 1 0 011.364-.372L10 8.848l1.254-.716a1 1 0 11.992 1.736L11 10.723V12a1 1 0 11-2 0v-1.277l-1.246-.855a1 1 0 01-.372-1.364zM3 11a1 1 0 011 1v1.277l1.246.855a1 1 0 11-.992 1.736l-1.75-1A1 1 0 012 14v-2a1 1 0 011-1zm14 0a1 1 0 011 1v2a1 1 0 01-.504.868l-1.75 1a1 1 0 11-.992-1.736L16 13.277V12a1 1 0 011-1zm-9.618 5.504a1 1 0 011.364-.372l.254.145V16a1 1 0 112 0v.277l.254-.145a1 1 0 11.992 1.736l-1.735.992a.995.995 0 01-1.022 0l-1.735-.992a1 1 0 01-.372-1.364z" clip-rule="evenodd" />
+                 </svg>
+                 Frameworks
+             </button>
+             <button class="category-button text-left w-full px-4 py-3 rounded-lg font-semibold hover:bg-dark-card flex items-center gap-2" data-category="Directives">
+                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                     <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                 </svg>
+                 Directives
+             </button>
+             <button class="category-button text-left w-full px-4 py-3 rounded-lg font-semibold hover:bg-dark-card flex items-center gap-2" data-category="Layout">
+                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                     <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm8 0a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1V8z" clip-rule="evenodd" />
+                 </svg>
+                 Layout
+             </button>
+             <button class="category-button text-left w-full px-4 py-3 rounded-lg font-semibold hover:bg-dark-card flex items-center gap-2" data-category="Style">
+                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                     <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clip-rule="evenodd" />
+                 </svg>
+                 Style
+             </button>
+             <button class="category-button text-left w-full px-4 py-3 rounded-lg font-semibold hover:bg-dark-card flex items-center gap-2" data-category="Typography">
+                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                     <path fill-rule="evenodd" d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z" clip-rule="evenodd" />
+                 </svg>
+                 Typography
+             </button>
+             <button class="category-button text-left w-full px-4 py-3 rounded-lg font-semibold hover:bg-dark-card flex items-center gap-2" data-category="Animation">
+                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                     <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 2h6v4H7V5zm8 8v2h1v-2h-1zm-2-2H7v4h6v-4z" clip-rule="evenodd" />
+                 </svg>
+                 Animation
+             </button>
+             <button class="category-button text-left w-full px-4 py-3 rounded-lg font-semibold hover:bg-dark-card flex items-center gap-2" data-category="Advanced">
+                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                     <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd" />
+                 </svg>
+                 Advanced
+             </button>
+        </div>
+
+        <!-- Options Panel -->
+        <div class="col-span-9 lg:col-span-6 glass-effect rounded-xl p-8 overflow-y-auto" id="options-panel">
+            <!-- Content will be dynamically loaded -->
+        </div>
+
+        <!-- Generated Prompts Panel -->
+        <div class="col-span-12 lg:col-span-4 glass-effect rounded-xl p-6 flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-white">GENERATED PROMPTS</h2>
+                <button id="clear-all-btn" class="text-sm text-slate-400 hover:text-white px-3 py-1 rounded-md hover:bg-dark-card">Clear All</button>
+            </div>
+            
+            <div id="generated-prompts-list" class="flex-grow space-y-3 mb-6 pr-2 overflow-y-auto">
+                <!-- Generated prompts will appear here -->
+            </div>
+            
+            <div class="mt-auto border-t border-slate-700 pt-6">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="text-sm font-semibold text-slate-300">Final Prompt</label>
+                    <span id="word-count" class="text-xs text-slate-400">0 words</span>
+                </div>
+                <textarea id="final-prompt" class="w-full h-40 p-4 bg-dark-surface text-slate-200 rounded-lg border border-slate-600 focus:outline-none focus:ring-2 focus:ring-ai-blue focus:border-transparent resize-none" placeholder="Your expertly crafted prompt will be assembled here..."></textarea>
+                
+                <div class="flex gap-3 mt-4">
+                    <button id="copy-prompt-btn" class="flex-1 px-6 py-3 bg-gradient-to-r from-ai-blue to-ai-purple text-white font-bold rounded-lg hover:from-ai-purple hover:to-ai-blue transition-all duration-300 glow-effect flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z"/>
+                            <path d="M3 5a2 2 0 012-2 3 3 0 003 3h6a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2V5h-2v6z"/>
+                        </svg>
+                        Copy Prompt
+                    </button>
+                    <button id="export-btn" class="px-6 py-3 bg-dark-card text-white font-semibold rounded-lg hover:bg-slate-600 transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const promptData = {
+        "Frameworks": {
+            "RTF Framework": {
+                type: 'single',
+                description: 'Role, Task, Format - Simple entry-level framework',
+                options: {
+                    "RTF Basic": "Role: Act as a [SPECIFY ROLE]. Task: [SPECIFY TASK]. Format: [SPECIFY OUTPUT FORMAT].",
+                    "RTF Creative": "Role: You are a creative expert in [FIELD]. Task: Create [SPECIFIC OUTPUT] that [SPECIFIC GOAL]. Format: Structure as [FORMAT SPECIFICATION] with [SPECIFIC REQUIREMENTS].",
+                    "RTF Professional": "Role: As a senior professional with 10+ years in [INDUSTRY]. Task: Develop comprehensive [DELIVERABLE] addressing [SPECIFIC CHALLENGE]. Format: Provide detailed [FORMAT] including [COMPONENTS]."
+                }
+            },
+            "APE Framework": {
+                type: 'single',
+                description: 'Action, Purpose, Expectation - Essential for beginners',
+                options: {
+                    "APE Basic": "Action: [SPECIFIC ACTION]. Purpose: [REASON/GOAL]. Expectation: [DESIRED OUTCOME].",
+                    "APE Detailed": "Action: Please [DETAILED ACTION] focusing on [SPECIFIC ASPECTS]. Purpose: This will be used for [SPECIFIC PURPOSE] to achieve [GOAL]. Expectation: Deliver [SPECIFIC FORMAT] that includes [KEY ELEMENTS] and meets [QUALITY STANDARDS].",
+                    "APE Creative": "Action: Generate innovative [CONTENT TYPE] that [SPECIFIC REQUIREMENT]. Purpose: To inspire [TARGET AUDIENCE] and [SPECIFIC OBJECTIVE]. Expectation: Create [NUMBER] variations that are [QUALITY DESCRIPTORS] and [SPECIFIC CRITERIA]."
+                }
+            },
+            "CHAT Framework": {
+                type: 'single',
+                description: 'Character, History, Ambition, Task - Professional choice',
+                options: {
+                    "CHAT Standard": "Character: [ROLE DEFINITION]. History: [BACKGROUND CONTEXT]. Ambition: [DESIRED OUTCOMES]. Task: [SPECIFIC WORK TO COMPLETE].",
+                    "CHAT Expert": "Character: You are [EXPERT ROLE] with [SPECIFIC EXPERTISE] and [EXPERIENCE LEVEL]. History: [DETAILED BACKGROUND] including [CURRENT SITUATION] and [CONSTRAINTS]. Ambition: Achieve [SPECIFIC GOALS] with [SUCCESS METRICS]. Task: [COMPREHENSIVE TASK LIST] delivered as [FORMAT REQUIREMENTS].",
+                    "CHAT Business": "Character: Senior [BUSINESS ROLE] specializing in [DOMAIN]. History: Working on [PROJECT TYPE] facing [CHALLENGES]. Ambition: [BUSINESS OBJECTIVES] measured by [KPIs]. Task: Provide [DELIVERABLES] with [TIMELINE] and [RESOURCE CONSIDERATIONS]."
+                }
+            },
+            "ROSES Framework": {
+                type: 'single',
+                description: 'Role, Objective, Scenario, Expected Solution, Steps - Project management',
+                options: {
+                    "ROSES Basic": "Role: [ROLE]. Objective: [OBJECTIVE]. Scenario: [SCENARIO]. Expected Solution: [SOLUTION]. Steps: [STEPS].",
+                    "ROSES Detailed": "Role: Act as [SPECIFIC ROLE] with [QUALIFICATIONS]. Objective: [MEASURABLE GOALS] within [TIMEFRAME]. Scenario: [DETAILED CONTEXT] including [STAKEHOLDERS] and [CONSTRAINTS]. Expected Solution: [SOLUTION CHARACTERISTICS] meeting [REQUIREMENTS]. Steps: [NUMBERED STEPS] with [TIMELINES] and [DELIVERABLES].",
+                    "ROSES Strategic": "Role: Strategic [EXPERT TYPE] with [DOMAIN EXPERTISE]. Objective: [STRATEGIC GOALS] with [SUCCESS CRITERIA]. Scenario: [COMPLEX SITUATION] involving [MULTIPLE FACTORS]. Expected Solution: [COMPREHENSIVE SOLUTION] addressing [KEY AREAS]. Steps: [PHASED APPROACH] with [MILESTONES] and [EVALUATION CRITERIA]."
+                }
+            },
+            "TRACE Framework": {
+                type: 'single',
+                description: 'Task, Request, Action, Context, Example - Task breakdown expert',
+                options: {
+                    "TRACE Basic": "Task: [TASK]. Request: [REQUEST]. Action: [ACTION]. Context: [CONTEXT]. Example: [EXAMPLE].",
+                    "TRACE Professional": "Task: [SPECIFIC TASK] with [SCOPE DEFINITION]. Request: [DETAILED REQUEST] including [SPECIFICATIONS]. Action: [STEP-BY-STEP ACTIONS] prioritized by [CRITERIA]. Context: [BACKGROUND INFO] including [CONSTRAINTS] and [RESOURCES]. Example: [RELEVANT EXAMPLES] demonstrating [KEY CONCEPTS].",
+                    "TRACE Complex": "Task: [MULTI-FACETED TASK] targeting [OBJECTIVES]. Request: [COMPREHENSIVE REQUEST] with [QUALITY STANDARDS]. Action: [DETAILED ACTION PLAN] with [DEPENDENCIES] and [CONTINGENCIES]. Context: [RICH CONTEXT] including [HISTORICAL DATA] and [ENVIRONMENTAL FACTORS]. Example: [MULTIPLE EXAMPLES] showing [BEST PRACTICES] and [COMMON PITFALLS]."
+                }
+            },
+            "SPAR Framework": {
+                type: 'single',
+                description: 'Scenario, Problem, Action, Result - Problem-solving expert',
+                options: {
+                    "SPAR Basic": "Scenario: [SCENARIO]. Problem: [PROBLEM]. Action: [ACTION]. Result: [EXPECTED RESULT].",
+                    "SPAR Analytical": "Scenario: [DETAILED SCENARIO] including [KEY STAKEHOLDERS]. Problem: [ROOT CAUSE ANALYSIS] with [IMPACT ASSESSMENT]. Action: [SOLUTION STRATEGY] with [IMPLEMENTATION PLAN]. Result: [MEASURABLE OUTCOMES] and [SUCCESS METRICS].",
+                    "SPAR Strategic": "Scenario: [COMPLEX SCENARIO] with [MULTIPLE VARIABLES]. Problem: [SYSTEMIC ISSUES] requiring [MULTI-PRONGED APPROACH]. Action: [COMPREHENSIVE STRATEGY] with [RISK MITIGATION]. Result: [TRANSFORMATIONAL OUTCOMES] with [LONG-TERM BENEFITS]."
+                }
+            }
+        },
+        "Directives": {
+            "Persona": {
+                type: 'single',
+                options: {
+                    "Senior UI/UX Designer": "Act as a senior UI/UX designer with 10+ years of experience in user-centered design.", 
+                    "Brand Strategist": "Act as a strategic brand consultant specializing in digital transformation.", 
+                    "Front-End Developer": "Act as a senior front-end developer expert in modern frameworks and best practices.", 
+                    "Creative Director": "Act as a creative director with expertise in digital experiences and visual storytelling.",
+                    "AI Prompt Engineer": "Act as an expert AI prompt engineer specializing in optimizing human-AI interactions.",
+                    "Technical Writer": "Act as a technical documentation specialist with expertise in clear communication.",
+                    "Product Manager": "Act as a senior product manager with experience in agile development and user research."
+                }
+            },
+            "Design Philosophy": {
+                type: 'multi',
+                options: {
+                    "Establish Visual Hierarchy": "Establish a clear visual hierarchy using size, color, and spacing.", 
+                    "Ensure High Contrast": "Ensure high contrast for readability and accessibility compliance.", 
+                    "Optimize Information Density": "Optimize for high information density without creating visual clutter.", 
+                    "Mobile-First Approach": "Use a mobile-first design approach with progressive enhancement.", 
+                    "Data-Driven Design": "Base all design decisions on user research and analytics data.",
+                    "Accessibility First": "Prioritize accessibility from the start, following WCAG 2.1 AA standards.",
+                    "Performance Optimization": "Optimize for fast loading and smooth interactions across all devices.",
+                    "Micro-Interactions": "Include thoughtful micro-interactions that enhance user experience."
+                }
+            },
+            "Constraints & Rules": {
+                type: 'multi',
+                options: {
+                    "WCAG AA Accessible": "The design must be WCAG 2.1 AA accessible with proper contrast ratios.", 
+                    "No Drop Shadows": "Do not use any drop shadows - use borders and backgrounds instead.", 
+                    "Use a 8pt Grid": "Use an 8pt grid system for consistent spacing and layout alignment.", 
+                    "Two-Color Palette Only": "Strictly adhere to a two-color palette (primary and neutral) plus white/black.",
+                    "Maximum 3 Font Weights": "Use no more than 3 font weights to maintain visual consistency.",
+                    "Mobile-First Constraints": "Design for 320px mobile first, then scale up responsively.",
+                    "Fast Loading Required": "Optimize all assets for sub-3-second loading times."
+                }
+            },
+            "Output Format": {
+                type: 'single',
+                options: {
+                    "Single HTML File": "Provide the complete output in a single HTML file with inline CSS and JavaScript.", 
+                    "Separate Files": "Provide the HTML, CSS, and JavaScript in separate, production-ready files.", 
+                    "Explain Choices": "Explain your design choices, referencing established UX principles and best practices.",
+                    "Component Library": "Structure as reusable components with clear documentation and usage examples.",
+                    "Framework Ready": "Output code ready for integration with React, Vue, or Angular frameworks.",
+                    "Style Guide": "Include a comprehensive style guide with design tokens and usage guidelines."
+                }
+            }
+        },
+        "Layout": {
+            "Layout Type": {
+                type: 'single',
+                options: { 
+                    "Web": "Create a web page",
+                    "Mobile": "Create a mobile screen",
+                    "Hero": "Create a hero section",
+                    "Features": "Create a features section",
+                    "Onboarding": "Create an onboarding flow",
+                    "Docs": "Create a documentation page",
+                    "Updates": "Create a product updates feed",
+                    "Portfolio": "Create a portfolio gallery",
+                    "Pricing": "Create a pricing page",
+                    "Gallery": "Create a gallery page",
+                    "Dashboard": "Create a dashboard",
+                    "Login": "Create a login screen",
+                    "Email": "Create an email template",
+                    "Testimonials": "Create a testimonials section",
+                    "Payment": "Create a payment screen",
+                    "Footer": "Create a footer section",
+                    "FAQ": "Create an FAQ section",
+                    "Explore": "Create an explore page",
+                    "Settings": "Create a settings page",
+                    "About": "Create an about us page",
+                    "Blog": "Create a blog layout",
+                    "Video": "Create a video showcase page",
+                    "Landing Page": "Create a landing page",
+                    "SaaS Platform": "Create a software-as-a-service platform interface",
+                    "Corporate Website": "Create a professional corporate website",
+                    "Creative Agency": "Create a bold creative agency website"
+                }
+            },
+            "Layout Configuration": {
+                type: 'single',
+                options: { 
+                    "Card": "using a card-based layout",
+                    "List": "using a list-based layout",
+                    "2-2 Square": "using a 2x2 grid",
+                    "Table": "using a table layout",
+                    "Sidebar Left": "with a sidebar on the left",
+                    "Sidebar Right": "with a sidebar on the right",
+                    "1-1 Split": "in a 1-1 split screen layout",
+                    "1-1 Vertical": "in a 1-1 vertical split layout",
+                    "1/3 2/3 Bento": "using a 1/3-2/3 bento box layout",
+                    "2/3 1/3 Bento": "using a 2/3-1/3 bento box layout",
+                    "1x4 Bento": "using a 1x4 bento box layout",
+                    "Feature Bento": "using a feature bento box layout",
+                    "Featured Right": "with a featured item on the right",
+                    "Featured Top": "with a featured item on the top",
+                    "1/4 2/4 1/4 Bento": "using a 1/4-2/4-1/4 bento box layout",
+                    "2/4 1/4 1/4 Bento": "using a 2/4-1/4-1/4 bento box layout",
+                    "2-1 Split": "in a 2-1 split layout",
+                    "1-2 Split": "in a 1-2 split layout",
+                    "1-1-1 Equal": "in a three-column equal-width layout",
+                    "Header Focus": "with a header focus layout",
+                    "3-3 Grid": "in a 3x3 grid",
+                    "Carousel": "as a carousel",
+                    "Modal": "within a modal window",
+                    "Alert": "as an alert component"
+                }
+            },
+            "Framing": {
+                type: 'single',
+                options: { 
+                    "Full Screen": "in a full-screen view",
+                    "Card": "framed within a card",
+                    "Browser": "framed within a browser window",
+                    "Mac App": "framed within a Mac app window",
+                    "Clay Web": "in a clay web-style mockup"
+                }
+            }
+        },
+        "Style": {
+            "Visual Style": {
+                type: 'single',
+                options: { 
+                    "Flat": "with a flat visual style",
+                    "Outline": "with an outline visual style",
+                    "Minimalist": "with a minimalist visual style",
+                    "Glass": "with a glassmorphism effect",
+                    "iOS": "with an iOS-style interface",
+                    "Material": "with a Material Design style",
+                    "Brutalist": "with a bold brutalist design approach",
+                    "Neumorphism": "with subtle neumorphism and soft shadows",
+                    "Retro/Vintage": "with retro vintage styling and color palettes",
+                    "High-Tech": "with a futuristic high-tech aesthetic"
+                }
+            },
+            "Theme": {
+                type: 'single',
+                options: { 
+                    "Light Mode": "using a light theme",
+                    "Dark Mode": "using a dark theme"
+                }
+            },
+            "Accent Color": {
+                type: 'single',
+                options: { 
+                    "Blue": "with a blue accent color",
+                    "Indigo": "with an indigo accent color",
+                    "Violet": "with a violet accent color",
+                    "Purple": "with a purple accent color",
+                    "Fuchsia": "with a fuchsia accent color",
+                    "Pink": "with a pink accent color",
+                    "Rose": "with a rose accent color",
+                    "Red": "with a red accent color",
+                    "Orange": "with an orange accent color",
+                    "Amber": "with an amber accent color",
+                    "Yellow": "with a yellow accent color",
+                    "Lime": "with a lime accent color",
+                    "Green": "with a green accent color",
+                    "Emerald": "with an emerald accent color",
+                    "Teal": "with a teal accent color",
+                    "Cyan": "with a cyan accent color",
+                    "Sky": "with a sky blue accent color"
+                }
+            },
+            "Background Color": {
+                type: 'single',
+                options: { 
+                    "Transparent": "on a transparent background",
+                    "Neutral": "on a neutral background",
+                    "Gray": "on a gray background",
+                    "Slate": "on a slate background",
+                    "Zinc": "on a zinc background",
+                    "Stone": "on a stone background",
+                    "Blue": "on a blue background",
+                    "Indigo": "on an indigo background",
+                    "Violet": "on a violet background",
+                    "Purple": "on a purple background",
+                    "Fuchsia": "on a fuchsia background",
+                    "Pink": "on a pink background",
+                    "Rose": "on a rose background",
+                    "Red": "on a red background",
+                    "Orange": "on an orange background",
+                    "Amber": "on an amber background",
+                    "Yellow": "on a yellow background",
+                    "Lime": "on a lime background",
+                    "Green": "on a green background",
+                    "Emerald": "on an emerald background",
+                    "Teal": "on a teal background",
+                    "Cyan": "on a cyan background",
+                    "Sky": "on a sky background"
+                }
+            },
+            "Border Color": {
+                type: 'single',
+                options: { 
+                    "Transparent": "with transparent borders",
+                    "Neutral": "with neutral borders",
+                    "Gray": "with gray borders",
+                    "Slate": "with slate borders",
+                    "Zinc": "with zinc borders",
+                    "Stone": "with stone borders",
+                    "Blue": "with blue borders",
+                    "Indigo": "with indigo borders",
+                    "Violet": "with violet borders",
+                    "Purple": "with purple borders",
+                    "Fuchsia": "with fuchsia borders",
+                    "Pink": "with pink borders",
+                    "Rose": "with rose borders",
+                    "Red": "with red borders",
+                    "Orange": "with orange borders",
+                    "Amber": "with amber borders",
+                    "Yellow": "with yellow borders",
+                    "Lime": "with lime borders",
+                    "Green": "with green borders",
+                    "Emerald": "with emerald borders",
+                    "Teal": "with teal borders",
+                    "Cyan": "with cyan borders",
+                    "Sky": "with sky borders"
+                }
+            },
+            "Shadow": {
+                type: 'single',
+                options: { 
+                    "None": "with no shadow",
+                    "Small": "with a small shadow",
+                    "Medium": "with a medium shadow",
+                    "Large": "with a large shadow",
+                    "Extra Large": "with an extra-large shadow",
+                    "XXL": "with an XXL shadow",
+                    "Beautiful sm": "with a small 'beautiful' shadow",
+                    "Beautiful md": "with a medium 'beautiful' shadow",
+                    "Beautiful lg": "with a large 'beautiful' shadow",
+                    "Light Blue sm": "with a small light blue shadow",
+                    "Light Blue md": "with a medium light blue shadow",
+                    "Light Blue lg": "with a large light blue shadow",
+                    "Bevel": "with a bevel effect",
+                    "3D": "with a 3D effect",
+                    "Inner Shadow": "with an inner shadow"
+                }
+            }
+        },
+        "Typography": {
+            "Typeface Family": {
+                type: 'single',
+                options: { 
+                    "Sans": "using a sans-serif typeface",
+                    "Serif": "using a serif typeface",
+                    "Monospace": "using a monospace typeface",
+                    "Condensed": "using a condensed typeface",
+                    "Expanded": "using an expanded typeface",
+                    "Rounded": "using a rounded typeface",
+                    "Handwritten": "using a handwritten typeface"
+                }
+            },
+            "Heading Font": {
+                type: 'single',
+                options: { 
+                    "Inter": "using Inter for headings",
+                    "Geist": "using Geist for headings",
+                    "Manrope": "using Manrope for headings",
+                    "Playfair Display": "using Playfair Display for headings",
+                    "Instrument Serif": "using Instrument Serif for headings",
+                    "Plex Serif": "using Plex Serif for headings",
+                    "Nunito": "using Nunito for headings",
+                    "Varela Round": "using Varela Round for headings",
+                    "Geist Mono": "using Geist Mono for headings",
+                    "Space Mono": "using Space Mono for headings",
+                    "Source Code Pro": "using Source Code Pro for headings"
+                }
+            },
+            "Body & UI Font": {
+                type: 'single',
+                options: { 
+                    "Inter": "using Inter for the body",
+                    "Geist": "using Geist for the body",
+                    "Manrope": "using Manrope for the body",
+                    "Playfair Display": "using Playfair Display for the body",
+                    "Instrument Serif": "using Instrument Serif for the body",
+                    "Plex Serif": "using Plex Serif for the body",
+                    "Nunito": "using Nunito for the body",
+                    "Varela Round": "using Varela Round for the body",
+                    "Geist Mono": "using Geist Mono for the body",
+                    "Space Mono": "using Space Mono for the body",
+                    "Source Code Pro": "using Source Code Pro for the body"
+                }
+            },
+            "Heading Size": {
+                type: 'single',
+                options: { 
+                    "20-32px": "with a heading size of 20-32px",
+                    "32-40px": "with a heading size of 32-40px",
+                    "48-64px": "with a heading size of 48-64px",
+                    "64-80px": "with a heading size of 64-80px"
+                }
+            },
+            "Subheading Size": {
+                type: 'single',
+                options: { 
+                    "16-20px": "with a subheading size of 16-20px",
+                    "20-24px": "with a subheading size of 20-24px",
+                    "24-28px": "with a subheading size of 24-28px",
+                    "28-32px": "with a subheading size of 28-32px"
+                }
+            },
+            "Body Text Size": {
+                type: 'single',
+                options: { 
+                    "12-14px": "with a body text size of 12-14px",
+                    "14-16px": "with a body text size of 14-16px",
+                    "16-18px": "with a body text size of 16-18px",
+                    "18-20px": "with a body text size of 18-20px"
+                }
+            },
+            "Heading Font Weight": {
+                type: 'single',
+                options: { 
+                    "Ultralight": "with ultralight headings",
+                    "Light": "with light headings",
+                    "Regular": "with regular weight headings",
+                    "Medium": "with medium weight headings",
+                    "Semibold": "with semibold headings",
+                    "Bold": "with bold headings",
+                    "Black": "with black weight headings"
+                }
+            },
+            "Heading Letter Spacing": {
+                type: 'single',
+                options: { 
+                    "Tighter": "with tighter heading letter spacing",
+                    "Tight": "with tight heading letter spacing",
+                    "Normal": "with normal heading letter spacing",
+                    "Wide": "with wide heading letter spacing",
+                    "Wider": "with wider heading letter spacing",
+                    "Widest": "with the widest heading letter spacing"
+                }
+            }
+        },
+        "Animation": {
+            "Animation Type": {
+                type: 'multi',
+                options: { 
+                    "Fade": "with a fade animation",
+                    "Slide": "with a slide animation",
+                    "Scale": "with a scale animation",
+                    "Rotate": "with a rotate animation",
+                    "Blur": "with a blur animation",
+                    "3D": "with a 3D transform animation",
+                    "Pulse": "with a pulse animation",
+                    "Shake": "with a shake animation",
+                    "Bounce": "with a bounce animation",
+                    "Morph": "with a morph animation",
+                    "Skew": "with a skew animation",
+                    "Color": "with a color transition animation",
+                    "Hue": "with a hue rotation animation",
+                    "Perspective": "with a perspective animation",
+                    "Clip": "with a clip-path animation"
+                }
+            },
+            "Scene": {
+                type: 'single',
+                options: { 
+                    "All at once": "where elements animate all at once",
+                    "Sequence": "where elements animate in sequence",
+                    "Word by word": "where text animates word by word",
+                    "Letter by letter": "where text animates letter by letter"
+                }
+            },
+            "Duration": {
+                type: 'single',
+                options: { 
+                    "0.8s": "with a duration of 0.8s",
+                    "0.3s": "with a duration of 0.3s",
+                    "0.5s": "with a duration of 0.5s",
+                    "1.0s": "with a duration of 1.0s",
+                    "1.5s": "with a duration of 1.5s",
+                    "2.0s": "with a duration of 2.0s"
+                }
+            },
+            "Delay": {
+                type: 'single',
+                options: { 
+                    "0.0s": "with no delay",
+                    "0.1s": "with a delay of 0.1s",
+                    "0.2s": "with a delay of 0.2s",
+                    "0.3s": "with a delay of 0.3s",
+                    "0.5s": "with a delay of 0.5s"
+                }
+            },
+            "Timing": {
+                type: 'single',
+                options: { 
+                    "Linear": "using a linear timing function",
+                    "Ease": "using an ease timing function",
+                    "Ease In": "using an ease-in timing function",
+                    "Ease Out": "using an ease-out timing function",
+                    "Ease In Out": "using an ease-in-out timing function",
+                    "Spring": "using a spring timing function",
+                    "Bounce": "using a bounce timing function"
+                }
+            },
+            "Iterations": {
+                type: 'single',
+                options: { 
+                    "Once": "that runs once",
+                    "Twice": "that runs twice",
+                    "Thrice": "that runs three times",
+                    "Infinite": "that iterates infinitely"
+                }
+            },
+            "Direction": {
+                type: 'single',
+                options: { 
+                    "Normal": "that runs in normal direction",
+                    "Reverse": "that runs in reverse",
+                    "Alternate": "that alternates direction",
+                    "Alternate Reverse": "that alternates in reverse direction"
+                }
+            }
+        },
+        "Advanced": {
+            "AI Integration": {
+                type: 'multi',
+                options: {
+                    "Prompt Engineering": "with expert prompt engineering techniques and optimization",
+                    "Context Awareness": "maintaining context awareness throughout the conversation",
+                    "Iterative Refinement": "allowing for iterative refinement and improvement",
+                    "Multi-modal Input": "supporting multiple input types (text, images, files)",
+                    "Output Validation": "with built-in output validation and quality checks"
+                }
+            },
+            "Technical Excellence": {
+                type: 'multi',
+                options: {
+                    "Performance Optimized": "optimized for exceptional performance and Core Web Vitals",
+                    "SEO Ready": "with comprehensive SEO optimization and semantic markup",
+                    "PWA Capabilities": "including Progressive Web App capabilities",
+                    "Security First": "implementing security best practices throughout",
+                    "Analytics Ready": "prepared for comprehensive analytics and tracking"
+                }
+            },
+            "Future-Proofing": {
+                type: 'multi',
+                options: {
+                    "Scalable Architecture": "built with scalable architecture patterns",
+                    "Maintainable Code": "with clean, maintainable, and documented code",
+                    "Cross-Platform": "optimized for cross-platform compatibility",
+                    "Internationalization": "prepared for internationalization and localization",
+                    "Technology Agnostic": "using technology-agnostic approaches where possible"
+                }
+            }
+        }
+    };
+
+    const optionsPanel = document.getElementById('options-panel');
+    const categoryButtons = document.querySelectorAll('.category-button');
+    const finalPromptTextarea = document.getElementById('final-prompt');
+    const generatedPromptsList = document.getElementById('generated-prompts-list');
+    const copyBtn = document.getElementById('copy-prompt-btn');
+    const clearAllBtn = document.getElementById('clear-all-btn');
+    const exportBtn = document.getElementById('export-btn');
+    const wordCount = document.getElementById('word-count');
+
+    let selections = {};
+
+    function renderOptions(category) {
+        optionsPanel.innerHTML = '';
+        const categoryData = promptData[category];
+        
+        // Add category header
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'mb-8';
+        headerDiv.innerHTML = `
+            <h2 class="text-2xl font-bold text-white mb-2">${category}</h2>
+            <p class="text-slate-400">${getCategoryDescription(category)}</p>
+        `;
+        optionsPanel.appendChild(headerDiv);
+        
+        for (const groupName in categoryData) {
+            const groupData = categoryData[groupName];
+            const container = document.createElement('div');
+            container.className = 'mb-8';
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'flex items-center gap-3 mb-4';
+            
+            const title = document.createElement('h3');
+            title.className = 'text-lg font-semibold text-white';
+            title.textContent = groupName;
+            titleDiv.appendChild(title);
+            
+            if (groupData.description) {
+                const badge = document.createElement('span');
+                badge.className = 'framework-badge';
+                badge.textContent = 'FRAMEWORK';
+                titleDiv.appendChild(badge);
+            }
+            
+            container.appendChild(titleDiv);
+            
+            if (groupData.description) {
+                const desc = document.createElement('p');
+                desc.className = 'text-sm text-slate-400 mb-4';
+                desc.textContent = groupData.description;
+                container.appendChild(desc);
+            }
+
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'grid grid-cols-1 gap-3';
+            container.appendChild(buttonsContainer);
+
+            for (const optionName in groupData.options) {
+                const button = document.createElement('button');
+                button.className = 'option-button p-4 text-left text-sm font-medium bg-dark-surface rounded-lg hover:bg-dark-card transition-all duration-300';
+                
+                const buttonContent = document.createElement('div');
+                buttonContent.innerHTML = `
+                    <div class="font-semibold text-white mb-1">${optionName}</div>
+                    <div class="text-slate-400 text-xs line-clamp-2">${groupData.options[optionName]}</div>
+                `;
+                button.appendChild(buttonContent);
+                
+                button.dataset.prompt = groupData.options[optionName];
+                button.dataset.group = groupName;
+                button.dataset.type = groupData.type;
+
+                if (selections[groupName] && (selections[groupName] === groupData.options[optionName] || selections[groupName]?.includes(groupData.options[optionName]))) {
+                     button.classList.add(groupData.type === 'single' ? 'selected' : 'multi-selected');
+                }
+
+                button.addEventListener('click', () => handleOptionClick(button));
+                buttonsContainer.appendChild(button);
+            }
+            optionsPanel.appendChild(container);
+        }
+    }
+
+    function getCategoryDescription(category) {
+        const descriptions = {
+            "Frameworks": "Advanced AI prompting frameworks for structured and effective communication",
+            "Directives": "Core instructions and persona definitions for AI interactions",
+            "Layout": "Comprehensive layout strategies and responsive design patterns",
+            "Style": "Visual design systems and aesthetic approaches",
+            "Typography": "Typography strategies for optimal readability and hierarchy",
+            "Animation": "Motion design and interactive feedback patterns",
+            "Advanced": "Cutting-edge techniques for professional AI-powered development"
+        };
+        return descriptions[category] || "";
+    }
+
+    function handleOptionClick(button) {
+        const { prompt, group, type } = button.dataset;
+
+        if (type === 'single') {
+            if (selections[group] === prompt) {
+                delete selections[group];
+                button.classList.remove('selected');
+            } else {
+                selections[group] = prompt;
+                document.querySelectorAll(`.option-button[data-group='${group}']`).forEach(btn => btn.classList.remove('selected'));
+                button.classList.add('selected');
+            }
+        } else { // multi
+            if (!selections[group]) selections[group] = [];
+            
+            const index = selections[group].indexOf(prompt);
+            if (index > -1) {
+                selections[group].splice(index, 1);
+                button.classList.remove('multi-selected');
+                if (selections[group].length === 0) delete selections[group];
+            } else {
+                selections[group].push(prompt);
+                button.classList.add('multi-selected');
+            }
+        }
+        updateFinalPrompt();
+    }
+
+    function updateFinalPrompt() {
+        generatedPromptsList.innerHTML = '';
+        const fullPromptParts = [];
+
+        const categoryOrder = ["Frameworks", "Directives", "Layout", "Style", "Typography", "Animation", "Advanced"];
+        
+        categoryOrder.forEach(cat => {
+            if (promptData[cat]) {
+                Object.keys(promptData[cat]).forEach(group => {
+                    if (selections[group]) {
+                        if (Array.isArray(selections[group])) {
+                            fullPromptParts.push(...selections[group]);
+                        } else {
+                            fullPromptParts.push(selections[group]);
+                        }
+                    }
+                });
+            }
+        });
+        
+        fullPromptParts.forEach((promptText, index) => {
+            const promptItem = document.createElement('div');
+            promptItem.className = 'prompt-item p-4 rounded-lg text-sm flex justify-between items-start gap-3';
+            
+            const content = document.createElement('div');
+            content.className = 'flex-1 text-slate-300';
+            content.textContent = promptText;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'text-slate-500 hover:text-red-400 text-lg leading-none';
+            removeBtn.innerHTML = '×';
+            removeBtn.onclick = () => removePromptPart(promptText);
+            
+            promptItem.appendChild(content);
+            promptItem.appendChild(removeBtn);
+            generatedPromptsList.appendChild(promptItem);
+        });
+
+        // Create final prompt with better formatting
+        let finalPrompt = fullPromptParts.join(' ');
+        if (finalPrompt) {
+            finalPrompt = finalPrompt.replace(/\.\s*/g, '. ').replace(/\s+/g, ' ').trim();
+            if (!finalPrompt.endsWith('.')) {
+                finalPrompt += '.';
+            }
+        }
+        
+        finalPromptTextarea.value = finalPrompt;
+        updateWordCount(finalPrompt);
+    }
+
+    function removePromptPart(promptText) {
+        // Find and remove the prompt part from selections
+        for (const group in selections) {
+            if (Array.isArray(selections[group])) {
+                const index = selections[group].indexOf(promptText);
+                if (index > -1) {
+                    selections[group].splice(index, 1);
+                    if (selections[group].length === 0) delete selections[group];
+                    break;
+                }
+            } else if (selections[group] === promptText) {
+                delete selections[group];
+                break;
+            }
+        }
+        
+        // Update UI
+        document.querySelectorAll('.option-button').forEach(btn => {
+            if (btn.dataset.prompt === promptText) {
+                btn.classList.remove('selected', 'multi-selected');
+            }
+        });
+        
+        updateFinalPrompt();
+    }
+
+    function updateWordCount(text) {
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        wordCount.textContent = `${words} words`;
+    }
+    
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            categoryButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+            renderOptions(button.dataset.category);
+        });
+    });
+    
+    copyBtn.addEventListener('click', () => {
+        if(finalPromptTextarea.value === "") return;
+        finalPromptTextarea.select();
+        navigator.clipboard.writeText(finalPromptTextarea.value);
+        copyBtn.innerHTML = `
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+            Copied!
+        `;
+        setTimeout(() => {
+            copyBtn.innerHTML = `
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z"/>
+                    <path d="M3 5a2 2 0 012-2 3 3 0 003 3h6a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2V5h-2v6z"/>
+                </svg>
+                Copy Prompt
+            `;
+        }, 2000);
+    });
+
+    clearAllBtn.addEventListener('click', () => {
+        selections = {};
+        document.querySelectorAll('.option-button').forEach(btn => {
+            btn.classList.remove('selected', 'multi-selected');
+        });
+        updateFinalPrompt();
+    });
+
+    exportBtn.addEventListener('click', () => {
+        const data = {
+            prompt: finalPromptTextarea.value,
+            selections: selections,
+            timestamp: new Date().toISOString()
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `prompt-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    // Initial render
+    renderOptions('Frameworks');
+
+    </script>
+</body>
+</html>
