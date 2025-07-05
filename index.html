@@ -86,13 +86,122 @@
         .glow-effect {
             box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
         }
+
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            .mobile-hidden {
+                display: none;
+            }
+
+            .mobile-sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 80%;
+                height: 100vh;
+                z-index: 50;
+                transition: left 0.3s ease-in-out;
+                background: rgba(15, 23, 42, 0.95);
+                backdrop-filter: blur(20px);
+            }
+
+            .mobile-sidebar.open {
+                left: 0;
+            }
+
+            .mobile-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease-in-out;
+            }
+
+            .mobile-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .mobile-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+                border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+                background: rgba(30, 41, 59, 0.8);
+                backdrop-filter: blur(20px);
+            }
+
+            .hamburger {
+                display: flex;
+                flex-direction: column;
+                cursor: pointer;
+                padding: 0.5rem;
+            }
+
+            .hamburger span {
+                width: 25px;
+                height: 3px;
+                background: #e2e8f0;
+                margin: 3px 0;
+                transition: 0.3s;
+                border-radius: 2px;
+            }
+
+            .hamburger.active span:nth-child(1) {
+                transform: rotate(-45deg) translate(-5px, 6px);
+            }
+
+            .hamburger.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.active span:nth-child(3) {
+                transform: rotate(45deg) translate(-5px, -6px);
+            }
+        }
+
+        /* Touch-friendly button sizes */
+        @media (max-width: 768px) {
+            .category-button {
+                min-height: 48px;
+                font-size: 1rem;
+            }
+
+            .option-button {
+                min-height: 56px;
+                padding: 1rem;
+            }
+
+            button {
+                min-height: 44px;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen">
+    <!-- Mobile Header -->
+    <div class="mobile-header md:hidden">
+        <div class="hamburger" id="mobile-menu-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <h1 class="text-lg font-bold text-white">AI PROMPT BUILDER</h1>
+        <div class="w-8"></div> <!-- Spacer for centering -->
+    </div>
 
-    <div class="grid grid-cols-12 gap-6 p-6 h-screen">
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <div class="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-6 p-4 md:p-6 min-h-screen md:h-screen">
         <!-- Sidebar -->
-        <div class="col-span-3 lg:col-span-2 glass-effect rounded-xl p-6 flex flex-col gap-3">
+        <div class="mobile-sidebar md:relative md:col-span-3 lg:col-span-2 glass-effect md:rounded-xl p-6 flex flex-col gap-3" id="sidebar">
              <div class="mb-6">
                  <h2 class="text-xl font-bold text-white mb-2">AI PROMPT BUILDER</h2>
                  <p class="text-sm text-slate-400">Professional frameworks & advanced prompting</p>
@@ -144,37 +253,37 @@
         </div>
 
         <!-- Options Panel -->
-        <div class="col-span-9 lg:col-span-6 glass-effect rounded-xl p-8 overflow-y-auto" id="options-panel">
+        <div class="md:col-span-9 lg:col-span-6 glass-effect rounded-xl p-4 md:p-8 overflow-y-auto order-2 md:order-none" id="options-panel">
             <!-- Content will be dynamically loaded -->
         </div>
 
         <!-- Generated Prompts Panel -->
-        <div class="col-span-12 lg:col-span-4 glass-effect rounded-xl p-6 flex flex-col">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-white">GENERATED PROMPTS</h2>
-                <button id="clear-all-btn" class="text-sm text-slate-400 hover:text-white px-3 py-1 rounded-md hover:bg-dark-card">Clear All</button>
+        <div class="md:col-span-12 lg:col-span-4 glass-effect rounded-xl p-4 md:p-6 flex flex-col order-3 md:order-none">
+            <div class="flex justify-between items-center mb-4 md:mb-6">
+                <h2 class="text-lg md:text-xl font-bold text-white">GENERATED PROMPTS</h2>
+                <button id="clear-all-btn" class="text-xs md:text-sm text-slate-400 hover:text-white px-2 md:px-3 py-1 rounded-md hover:bg-dark-card min-h-[36px]">Clear All</button>
             </div>
             
             <div id="generated-prompts-list" class="flex-grow space-y-3 mb-6 pr-2 overflow-y-auto">
                 <!-- Generated prompts will appear here -->
             </div>
             
-            <div class="mt-auto border-t border-slate-700 pt-6">
+            <div class="mt-auto border-t border-slate-700 pt-4 md:pt-6">
                 <div class="flex justify-between items-center mb-3">
-                    <label class="text-sm font-semibold text-slate-300">Final Prompt</label>
+                    <label class="text-sm md:text-sm font-semibold text-slate-300">Final Prompt</label>
                     <span id="word-count" class="text-xs text-slate-400">0 words</span>
                 </div>
-                <textarea id="final-prompt" class="w-full h-40 p-4 bg-dark-surface text-slate-200 rounded-lg border border-slate-600 focus:outline-none focus:ring-2 focus:ring-ai-blue focus:border-transparent resize-none" placeholder="Your expertly crafted prompt will be assembled here..."></textarea>
-                
-                <div class="flex gap-3 mt-4">
-                    <button id="copy-prompt-btn" class="flex-1 px-6 py-3 bg-gradient-to-r from-ai-blue to-ai-purple text-white font-bold rounded-lg hover:from-ai-purple hover:to-ai-blue transition-all duration-300 glow-effect flex items-center justify-center gap-2">
+                <textarea id="final-prompt" class="w-full h-32 md:h-40 p-3 md:p-4 bg-dark-surface text-slate-200 rounded-lg border border-slate-600 focus:outline-none focus:ring-2 focus:ring-ai-blue focus:border-transparent resize-none text-sm md:text-base" placeholder="Your expertly crafted prompt will be assembled here..."></textarea>
+
+                <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                    <button id="copy-prompt-btn" class="flex-1 px-4 md:px-6 py-3 md:py-3 bg-gradient-to-r from-ai-blue to-ai-purple text-white font-bold rounded-lg hover:from-ai-purple hover:to-ai-blue transition-all duration-300 glow-effect flex items-center justify-center gap-2 text-sm md:text-base min-h-[48px]">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z"/>
                             <path d="M3 5a2 2 0 012-2 3 3 0 003 3h6a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2V5h-2v6z"/>
                         </svg>
                         Copy Prompt
                     </button>
-                    <button id="export-btn" class="px-6 py-3 bg-dark-card text-white font-semibold rounded-lg hover:bg-slate-600 transition-colors flex items-center gap-2">
+                    <button id="export-btn" class="px-4 md:px-6 py-3 bg-dark-card text-white font-semibold rounded-lg hover:bg-slate-600 transition-colors flex items-center justify-center gap-2 text-sm md:text-base min-h-[48px]">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                         </svg>
@@ -753,12 +862,12 @@
             }
 
             const buttonsContainer = document.createElement('div');
-            buttonsContainer.className = 'grid grid-cols-1 gap-3';
+            buttonsContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3';
             container.appendChild(buttonsContainer);
 
             for (const optionName in groupData.options) {
                 const button = document.createElement('button');
-                button.className = 'option-button p-4 text-left text-sm font-medium bg-dark-surface rounded-lg hover:bg-dark-card transition-all duration-300';
+                button.className = 'option-button p-3 md:p-4 text-left text-sm md:text-sm font-medium bg-dark-surface rounded-lg hover:bg-dark-card transition-all duration-300 min-h-[56px] flex flex-col justify-center';
                 
                 const buttonContent = document.createElement('div');
                 buttonContent.innerHTML = `
@@ -961,6 +1070,60 @@
 
     // Initial render
     renderOptions('Frameworks');
+
+    // Mobile menu functionality
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    const sidebar = document.getElementById('sidebar');
+
+    function toggleMobileMenu() {
+        const hamburger = mobileMenuBtn;
+        const isOpen = sidebar.classList.contains('open');
+
+        if (isOpen) {
+            sidebar.classList.remove('open');
+            mobileOverlay.classList.remove('active');
+            hamburger.classList.remove('active');
+            document.body.style.overflow = '';
+        } else {
+            sidebar.classList.add('open');
+            mobileOverlay.classList.add('active');
+            hamburger.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeMobileMenu() {
+        sidebar.classList.remove('open');
+        mobileOverlay.classList.remove('active');
+        mobileMenuBtn.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Event listeners for mobile menu
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    }
+
+    if (mobileOverlay) {
+        mobileOverlay.addEventListener('click', closeMobileMenu);
+    }
+
+    // Close mobile menu when category is selected
+    document.querySelectorAll('.category-button').forEach(button => {
+        button.addEventListener('click', () => {
+            if (window.innerWidth < 768) {
+                closeMobileMenu();
+            }
+        });
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+            closeMobileMenu();
+        }
+    });
 
     </script>
 </body>
